@@ -2,7 +2,9 @@ package transaction;
 
 import java.util.Date;
 import java.util.UUID;
-import java.util.Locale.Category;
+
+import category.Category;
+
 
 public class Transaction {
     private String id;

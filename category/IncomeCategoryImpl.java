@@ -10,4 +10,9 @@ public class IncomeCategoryImpl extends Category {
     public int getOperator() {
         return 1;
     }
+
+    @Override
+    public String getType() {
+        return "income";
+    }
 }

@@ -6,7 +6,7 @@ public abstract class Category {
 
     private String name;
     private String id;
-    private double budget;
+    private double budget; // 0 if no budget
 
     public Category(String name) {
         // create a unique id for this category length of 4
@@ -35,4 +35,6 @@ public abstract class Category {
     }
 
     public abstract int getOperator();
+
+    public abstract String getType();
 }
