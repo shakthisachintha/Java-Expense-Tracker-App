@@ -2,7 +2,7 @@ package category;
 
 import java.util.UUID;
 
-import transaction.types.TransactionType;
+import types.TransactionType;
 
 public abstract class Category {
 

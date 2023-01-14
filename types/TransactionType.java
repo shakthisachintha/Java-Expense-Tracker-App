@@ -1,4 +1,4 @@
-package transaction.types;
+package types;
 
 public enum TransactionType {
     INCOME, EXPENSE

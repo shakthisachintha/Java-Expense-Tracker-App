@@ -1,6 +1,6 @@
 package category;
 
-import transaction.types.TransactionType;
+import types.TransactionType;
 
 public class IncomeCategoryImpl extends Category {
     

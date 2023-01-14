@@ -1,25 +1,24 @@
 package expensetracker;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import category.Category;
-import category.CategoryFactory;
 import month.Month;
 import transaction.Transaction;
-import transaction.types.TransactionType;
+import types.TransactionType;
 
 public class ExpenseTrackerImpl implements ExpenseTracker {
 
-    // Map<MonthName, Map<CategoryId, List<Transaction>>>
-    private Map<String, Map<String, List<Transaction>>> mainDataStructure = new HashMap<>();
-    private Map<String, Transaction> recurringTransactions = new HashMap<>();
-    private Map<String, Category> categories = new HashMap<>();
+    // Main data mapping structure
+    // Map<MonthName, Map<CategoryId, List<TransactionID>>>
+    private Map<String, Map<String, List<String>>> mainDataStructure = new HashMap<>();
+
+    // Main data storage
     // Map<MonthName, Month>
     private Map<String, Month> months = new HashMap<>();
     private Map<String, Transaction> transactions = new HashMap<>();
-    private static boolean hasSetDefaultData = false;
+    private Map<String, Transaction> recurringTransactions = new HashMap<>();
+    private Map<String, Category> categories = new HashMap<>();
 
     // Singleton pattern
     private static ExpenseTrackerImpl expenseTracker;
@@ -40,9 +39,40 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         } else {
             addNonRecurringTransaction(transaction);
         }
+        addTransactionToMainDataStructure(transaction);
+    }
+
+    private void addTransactionToMainDataStructure(Transaction transaction) {
+        // get the month key
+        String monthKey = transaction.getDate().getMonthName().toLowerCase();
+
+        // get the category key
+        String categoryKey = transaction.getCategory().getId().toLowerCase();
+
+        // get the list of transactions for the month and category
+        var transactions = mainDataStructure.get(monthKey).get(categoryKey);
+
+        // add the transaction to the list
+        transactions.add(transaction.getId());
+
+        // add the transaction to the main data structure
+        mainDataStructure.get(monthKey).put(categoryKey, transactions);
     }
 
     public void addCategory(Category category) {
+        // get the category key
+        var categoryKey = category.getId().toLowerCase();
+
+        // get all month keys
+        var monthKeys = months.keySet();
+        
+        // for each month
+        for (var monthKey : monthKeys) {
+            // add the category to the main data structure
+            mainDataStructure.get(monthKey).put(categoryKey, new ArrayList<>());
+        }
+
+        // add the category to the categories map
         categories.put(category.getId(), category);
     }
 
@@ -58,18 +88,68 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
 
     @Override
     public void newMonth(String month, double budget) {
+        // month key
+        String monthKey = month.toLowerCase();
         Month mon = new Month(month, budget);
-        months.put(month, mon);
+        addMonthToMainDataStructure(mon);
+        months.put(monthKey, mon);
     }
 
     @Override
-    public void newMonth(String month) {
-        Month mon = new Month(month);
-        months.put(month, mon);
+    public void newMonth(String monthName) {
+        // month key
+        String monthKey = monthName.toLowerCase();
+
+        // create new month object
+        Month mon = new Month(monthName);
+
+        // add the month to the main data structure
+        addMonthToMainDataStructure(mon);
+
+        // add to the months map
+        months.put(monthKey, mon);
+    }
+
+    private void addMonthToMainDataStructure (Month month) {
+        // month key
+        String monthKey = month.getName().toLowerCase();
+        
+        // add to main data structure
+        mainDataStructure.put(monthKey, new HashMap<String, List<String>>());
     }
 
     @Override
     public void deleteTransaction(String transactionId) {
+        // transaction key
+        String transactionKey = transactionId.toLowerCase();
+
+        // get the transaction
+        Transaction transaction = transactions.containsKey(transactionKey) ? transactions.get(transactionKey)
+                : recurringTransactions.get(transactionKey);
+
+        // if transaction is recurring
+        if (transaction.isRecurring()) {
+            // mark the transaction as inactive
+            recurringTransactions.remove(transactionKey).setActive(false);
+            ;
+
+        } else {
+            // get the month key
+            String monthKey = transaction.getDate().getMonthName().toLowerCase();
+
+            // get the category key
+            String categoryKey = transaction.getCategory().getId().toLowerCase();
+
+            // get the list of transactions for the month and category
+            var transactions = mainDataStructure.get(monthKey).get(categoryKey);
+
+            // remove the transaction from the list
+            transactions.remove(transactionKey);
+
+            // delete the transaction
+            this.transactions.remove(transactionKey);
+        }
+
         transactions.get(transactionId).setActive(false);
     }
 
@@ -82,16 +162,26 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
 
     @Override
     public List<Transaction> getTransactionsForMonth(String month) {
+        // month key
+        String monthKey = month.toLowerCase();
+
         // check if the month exists
-        if (months.containsKey(month.toLowerCase())) {
-            // get the month
-            var monthObject = mainDataStructure.get(month.toLowerCase(null));
-            var transactionsList = new ArrayList<Transaction>();
-            // get all the transactions from the monthObj
-            for (var category : monthObject.values()) {
-                transactionsList.addAll(category);
+        if (months.containsKey(monthKey)) {
+            // get category keys for the month
+            var categoryKeys = mainDataStructure.get(monthKey).keySet();
+
+            // get all the transactions for the month
+            var transactions = new ArrayList<Transaction>();
+
+            // loop through the categories
+            for (String categoryKey : categoryKeys) {
+                // get the transactions for the category
+                var categoryTransactions = this.getMonthlyTransactionForCategory(monthKey, categoryKey);
+
+                // add the transactions to the list
+                transactions.addAll(categoryTransactions);
             }
-            return transactionsList;
+            return transactions;
         } else {
             // if month not exist return an empty array
             return new ArrayList<Transaction>();
@@ -124,33 +214,38 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
 
     @Override
     public List<DtoMonthlySummaryData> getSummaryForMonth(String month) {
+        // month key
+        String monthKey = month.toLowerCase();
+
         // check if the month exists
-        if (months.containsKey(month.toLowerCase())) {
-            // get the month
-            var monthCats = mainDataStructure.get(month.toLowerCase(null));
+        if (months.containsKey(monthKey)) {
+            // get the categories for the month
+            var categoryKeys = mainDataStructure.get(monthKey).keySet();
 
             // get total amount spent in each category
             var summary = new ArrayList<DtoMonthlySummaryData>();
 
-            int i = 0;
-            for (List<Transaction> trans : monthCats.values()) {
-
-                DtoMonthlySummaryData summaryRow = new DtoMonthlySummaryData();
-                // get the category name and type
-                summaryRow.category = trans.get(i).getCategory();
+            // iterate over the categoryKeys
+            for (String categoryKey : categoryKeys) {
+                // get the transactions for the category
+                var categoryTransactions = this.getMonthlyTransactionForCategory(monthKey, categoryKey);
 
                 // get the total amount spent in the category
                 double total = 0;
-                for (var transaction : trans) {
+                for (var transaction : categoryTransactions) {
                     total += transaction.getAmount();
                 }
 
+                // get the category name and type
+                var category = categories.get(categoryKey);
+
                 // add the total amount to the summary
+                var summaryRow = new DtoMonthlySummaryData();
+                summaryRow.category = category;
                 summaryRow.totalAmount = total;
 
                 // add the summary row to the summary
                 summary.add(summaryRow);
-                i++;
             }
             // return the summary
             return summary;
@@ -162,7 +257,7 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
 
     @Override
     public DtoFullDetailsForMonth getFullDetailsForMonth(String month) {
-        String monthKey  = month.toLowerCase();
+        String monthKey = month.toLowerCase();
         // check if the month exists
         if (months.containsKey(monthKey)) {
             // get the month
@@ -187,11 +282,11 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
                 // create a new DtoCategoryTransactions object
                 var categoryTransactions = new CategoryTransactions();
                 categoryTransactions.category = category;
-                categoryTransactions.transactions = getActiveTransactionForCatForMonth(monthKey, categoryKey);
+                categoryTransactions.transactions = getMonthlyTransactionForCategory(monthKey, categoryKey);
 
                 // add total income and expenses
-                for (var transaction : categoryTransactions.transactions){
-                    if (transaction.getType() == TransactionType.INCOME){
+                for (var transaction : categoryTransactions.transactions) {
+                    if (transaction.getType() == TransactionType.INCOME) {
                         totalIncome += transaction.getAmount();
                     } else {
                         totalExpenses += transaction.getAmount();
@@ -219,17 +314,19 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         return new DtoFullDetailsForMonth();
     }
 
-    private List<Transaction> getActiveTransactionForCatForMonth (String month, String categoryId){
+    private List<Transaction> getMonthlyTransactionForCategory(String month, String categoryId) {
         String monthKey = month.toLowerCase();
         String categoryKey = categoryId.toLowerCase();
 
-        if (mainDataStructure.containsKey(categoryKey) && mainDataStructure.get(categoryKey).containsKey(monthKey)){
-            var transactions = mainDataStructure.get(categoryKey).get(monthKey);
+        if (mainDataStructure.containsKey(categoryKey) && mainDataStructure.get(categoryKey).containsKey(monthKey)) {
+            var transactionKeys = mainDataStructure.get(categoryKey).get(monthKey);
             var activeTransactions = new ArrayList<Transaction>();
-            for (var transaction : transactions){
-                if (transaction.isActive()){
-                    activeTransactions.add(transaction);
-                }
+
+            for (var transactionKey : transactionKeys) {
+                var transaction = transactions.containsKey(transactionKey) ? transactions.get(transactionKey)
+                        : recurringTransactions.get(transactionKey);
+
+                activeTransactions.add(transaction);
             }
             return activeTransactions;
         }
