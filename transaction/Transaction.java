@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import category.Category;
+import transaction.types.TransactionType;
 
 public class Transaction {
     private String id;
@@ -28,7 +29,26 @@ public class Transaction {
     }
 
     public double getAmount() {
+        if (isActive) {
+            return amount;
+        }
+        return 0.0;
+    }
+
+    public double getRawAmount() {
         return amount;
+    }
+
+    public double getAmountForTotal() {
+        if (isActive) {
+            return amount * this.category.getOperator();
+        } else {
+            return 0;
+        }
+    }
+
+    public TransactionType getType() {
+        return this.category.getType();
     }
 
     public Category getCategory() {

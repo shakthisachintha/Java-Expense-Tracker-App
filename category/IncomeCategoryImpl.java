@@ -1,5 +1,7 @@
 package category;
 
+import transaction.types.TransactionType;
+
 public class IncomeCategoryImpl extends Category {
     
     public IncomeCategoryImpl(String name) {
@@ -12,7 +14,7 @@ public class IncomeCategoryImpl extends Category {
     }
 
     @Override
-    public String getType() {
-        return "income";
+    public TransactionType getType() {
+        return TransactionType.INCOME;
     }
 }

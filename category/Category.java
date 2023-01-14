@@ -2,6 +2,8 @@ package category;
 
 import java.util.UUID;
 
+import transaction.types.TransactionType;
+
 public abstract class Category {
 
     private String name;
@@ -36,5 +38,5 @@ public abstract class Category {
 
     public abstract int getOperator();
 
-    public abstract String getType();
+    public abstract TransactionType getType();
 }

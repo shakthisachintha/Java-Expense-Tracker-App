@@ -8,6 +8,7 @@ import category.Category;
 import category.CategoryFactory;
 import month.Month;
 import transaction.Transaction;
+import transaction.types.TransactionType;
 
 public class ExpenseTrackerImpl implements ExpenseTracker {
 
@@ -26,24 +27,11 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     private ExpenseTrackerImpl() {
     }
 
-    public static ExpenseTrackerImpl getExpenseTracker(Boolean defaultData) {
-        if (!defaultData) {
-            if (expenseTracker == null) {
-                return new ExpenseTrackerImpl();
-            } else {
-                return expenseTracker;
-            }
-        } else {
-            if (!hasSetDefaultData) {
-                if (expenseTracker == null) {
-                    expenseTracker = new ExpenseTrackerImpl();
-                }
-                return setDefaultTrackerData();
-            } else {
-                return expenseTracker;
-            }
+    public static ExpenseTrackerImpl getExpenseTracker() {
+        if (expenseTracker == null) {
+            expenseTracker = new ExpenseTrackerImpl();
         }
-
+        return expenseTracker;
     }
 
     public void addTransaction(Transaction transaction) {
@@ -93,7 +81,7 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     }
 
     @Override
-    public Transaction[] getTransactionsForMonth(String month) {
+    public List<Transaction> getTransactionsForMonth(String month) {
         // check if the month exists
         if (months.containsKey(month.toLowerCase())) {
             // get the month
@@ -103,10 +91,10 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             for (var category : monthObject.values()) {
                 transactionsList.addAll(category);
             }
-            return transactionsList.toArray(new Transaction[transactionsList.size()]);
+            return transactionsList;
         } else {
             // if month not exist return an empty array
-            return new Transaction[0];
+            return new ArrayList<Transaction>();
         }
     }
 
@@ -135,21 +123,21 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     }
 
     @Override
-    public String[][] getSummaryForMonth(String month) {
+    public List<DtoMonthlySummaryData> getSummaryForMonth(String month) {
         // check if the month exists
         if (months.containsKey(month.toLowerCase())) {
             // get the month
             var monthCats = mainDataStructure.get(month.toLowerCase(null));
 
             // get total amount spent in each category
-            var summary = new String[monthCats.size()][3];
+            var summary = new ArrayList<DtoMonthlySummaryData>();
 
             int i = 0;
             for (List<Transaction> trans : monthCats.values()) {
 
+                DtoMonthlySummaryData summaryRow = new DtoMonthlySummaryData();
                 // get the category name and type
-                summary[i][0] = trans.get(i).getCategory().getName();
-                summary[i][1] = trans.get(i).getCategory().getType();
+                summaryRow.category = trans.get(i).getCategory();
 
                 // get the total amount spent in the category
                 double total = 0;
@@ -158,89 +146,94 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
                 }
 
                 // add the total amount to the summary
-                summary[i][2] = "LKR " + total;
+                summaryRow.totalAmount = total;
+
+                // add the summary row to the summary
+                summary.add(summaryRow);
                 i++;
             }
             // return the summary
             return summary;
 
         }
-        // if month not exist return an empty array
-        return new String[0][0];
-
+        // if month not exist return an empty list
+        return new ArrayList<DtoMonthlySummaryData>();
     }
 
     @Override
-    public Transaction[] getTransactionsByCategoryForMonth(String month, String categoryId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    public DtoFullDetailsForMonth getFullDetailsForMonth(String month) {
+        String monthKey  = month.toLowerCase();
+        // check if the month exists
+        if (months.containsKey(monthKey)) {
+            // get the month
+            var monthCats = mainDataStructure.get(monthKey);
 
-    private static ExpenseTrackerImpl setDefaultTrackerData() {
+            // get total amount spent in each category
+            var summary = new ArrayList<CategoryTransactions>();
 
-        hasSetDefaultData = true;
+            // get category key
+            var categoryKeys = monthCats.keySet();
 
-        // add default categories
-        Category salary = CategoryFactory.createIncomeCategory("Salary");
-        Category eatingOut = CategoryFactory.createExpenseCategory("Eating Out");
-        Category credit = CategoryFactory.createExpenseCategory("Credit");
-        Category entertainment = CategoryFactory.createExpenseCategory("Entertainment");
-        Category fuel = CategoryFactory.createExpenseCategory("Fuel");
-        Category general = CategoryFactory.createExpenseCategory("General");
-        Category holidays = CategoryFactory.createExpenseCategory("Holidays");
-        Category kids = CategoryFactory.createExpenseCategory("Kids");
-        Category shopping = CategoryFactory.createExpenseCategory("Shopping");
-        Category sports = CategoryFactory.createExpenseCategory("Sports");
-        Category travel = CategoryFactory.createExpenseCategory("Travel");
+            // total income and expenses
+            double totalIncome = 0;
+            double totalExpenses = 0;
+            double balance = 0;
 
-        expenseTracker.newMonth("January", 35000);
+            // get the transactions for each category
+            for (var categoryKey : categoryKeys) {
+                // get the category
+                var category = categories.get(categoryKey);
 
-        // add default categories to the expense tracker
-        expenseTracker.addCategory(salary);
-        expenseTracker.addCategory(eatingOut);
-        expenseTracker.addCategory(credit);
-        expenseTracker.addCategory(entertainment);
-        expenseTracker.addCategory(fuel);
-        expenseTracker.addCategory(general);
-        expenseTracker.addCategory(holidays);
-        expenseTracker.addCategory(kids);
-        expenseTracker.addCategory(shopping);
-        expenseTracker.addCategory(sports);
-        expenseTracker.addCategory(travel);
+                // create a new DtoCategoryTransactions object
+                var categoryTransactions = new CategoryTransactions();
+                categoryTransactions.category = category;
+                categoryTransactions.transactions = getActiveTransactionForCatForMonth(monthKey, categoryKey);
 
-        // add sample dates
-        Date date1 = new Date();
-        Date date2 = new Date();
-        Date date3 = new Date();
-        Date date4 = new Date();
-        Date date5 = new Date();
-        try {
-            date1 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-05");
-            date2 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-07");
-            date3 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-12");
-            date4 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-18");
-            date5 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-27");
-        } catch (ParseException e) {
-            e.printStackTrace();
+                // add total income and expenses
+                for (var transaction : categoryTransactions.transactions){
+                    if (transaction.getType() == TransactionType.INCOME){
+                        totalIncome += transaction.getAmount();
+                    } else {
+                        totalExpenses += transaction.getAmount();
+                    }
+                    balance += transaction.getAmountForTotal();
+                }
+
+                // add the categoryTransactions to the summary
+                summary.add(categoryTransactions);
+            }
+
+            // create a new DtoFullDetailsForMonth object
+            var fullDetails = new DtoFullDetailsForMonth();
+            fullDetails.month = months.get(monthKey);
+            fullDetails.categoryTransactions = summary;
+            fullDetails.totalIncome = totalIncome;
+            fullDetails.totalExpense = totalExpenses;
+            fullDetails.totalBalance = balance;
+
+            // return the summary
+            return fullDetails;
         }
 
-        // add default transactions
-        Transaction t1 = new Transaction(1000, eatingOut, "My Birthday treat for family members", date1);
-        Transaction t2 = new Transaction(5000, fuel, "Filled my car up with petrol", date2);
-        Transaction t3 = new Transaction(12400, entertainment, "Had party with friends", date3);
-        Transaction t4 = new Transaction(23000, shopping, "Shopping with the family", date4);
-        Transaction t5 = new Transaction(9500, eatingOut, "Trip to yala with the friends", date5);
-        Transaction t6 = new Transaction(115000, salary, "December Salary received", date5);
+        // if month not exist return an empty list
+        return new DtoFullDetailsForMonth();
+    }
 
-        // add all the default transactions to expense tracker transaction list
-        expenseTracker.addTransaction(t1);
-        expenseTracker.addTransaction(t2);
-        expenseTracker.addTransaction(t3);
-        expenseTracker.addTransaction(t4);
-        expenseTracker.addTransaction(t5);
-        expenseTracker.addTransaction(t6);
+    private List<Transaction> getActiveTransactionForCatForMonth (String month, String categoryId){
+        String monthKey = month.toLowerCase();
+        String categoryKey = categoryId.toLowerCase();
 
-        return expenseTracker;
+        if (mainDataStructure.containsKey(categoryKey) && mainDataStructure.get(categoryKey).containsKey(monthKey)){
+            var transactions = mainDataStructure.get(categoryKey).get(monthKey);
+            var activeTransactions = new ArrayList<Transaction>();
+            for (var transaction : transactions){
+                if (transaction.isActive()){
+                    activeTransactions.add(transaction);
+                }
+            }
+            return activeTransactions;
+        }
+        return new ArrayList<Transaction>();
     }
 
 }

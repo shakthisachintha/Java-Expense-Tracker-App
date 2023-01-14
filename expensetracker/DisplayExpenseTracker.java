@@ -9,7 +9,7 @@ import constants.Constants;
 public class DisplayExpenseTracker {
 
     // create a new ExpenseTracker object
-    static ExpenseTracker tracker = ExpenseTrackerImpl.getExpenseTracker(true);
+    static ExpenseTracker tracker = ExpenseTrackerFactory.getExpenseTrackerWithDefaultData();
 
     static String outlineColor = Constants.COLOR_WHITE;
 

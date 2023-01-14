@@ -1,8 +1,29 @@
 package expensetracker;
 
+import java.util.List;
+
 import category.Category;
 import month.Month;
 import transaction.Transaction;
+
+class CategoryTransactions {
+    public Category category;
+    public List<Transaction> transactions;
+    public double totalAmount;
+}
+
+class DtoMonthlySummaryData {
+    public Category category;
+    public double totalAmount;
+}
+
+class DtoFullDetailsForMonth {
+    public Month month;
+    public List<CategoryTransactions> categoryTransactions;
+    public double totalIncome;
+    public double totalExpense;
+    public double totalBalance;
+}
 
 public interface ExpenseTracker {
     void addTransaction(Transaction transaction);
@@ -17,22 +38,30 @@ public interface ExpenseTracker {
 
     void updateTransaction(String transactionId, String note, double amount);
 
-    Transaction[] getTransactionsByCategoryForMonth(String month, String categoryId);
-
-    Transaction[] getTransactionsForMonth(String month);
-
-    /**
-     * Returns a 2D array of Strings where the first column is the category name
-     * second column is whether the category is 'income' or 'expense'
-     * third column total amount spent in that category for the month.
-     * 
-     * @param month month name to get summary for
-     * @return ["Groceries", "expense", "USD 100.00"]
-     *["Salary", "income", "USD 1200.00"]
-     */
-    String[][] getSummaryForMonth(String month);
-
     Category[] getCategories();
 
     Month[] getMonths();
+
+    List<Transaction> getTransactionsForMonth(String month);
+
+    /**
+     * This method returns all the transactions for the month along with the
+     * category name and total amount spent in each category.
+     * 
+     * @param month month name to get details for
+     * @return an instance of DtoFullDetailsForMonth
+     * @see DtoFullDetailsForMonth
+     */
+    public DtoFullDetailsForMonth getFullDetailsForMonth(String month);
+
+    /**
+     * This is the summary for the month. It returns total amount spent in each
+     * category for the month.
+     * 
+     * @param month month name to get summary for
+     * @return an instance of DtoMonthlySummaryData
+     * @see DtoMonthlySummaryData
+     */
+    List<DtoMonthlySummaryData> getSummaryForMonth(String month);
+
 }
