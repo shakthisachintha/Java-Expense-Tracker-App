@@ -29,6 +29,8 @@ public class main {
         Category shopping = CategoryFactory.createExpenseCategory("Shopping");
         Category sports = CategoryFactory.createExpenseCategory("Sports");
         Category travel = CategoryFactory.createExpenseCategory("Travel");
+        
+        tracker.newMonth("January", 35000);
 
         // add default categories to the expense tracker
         tracker.addCategory(salary);
