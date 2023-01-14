@@ -38,11 +38,15 @@ public interface ExpenseTracker {
 
     void updateTransaction(String transactionId, String note, double amount);
 
-    Category[] getCategories();
+    List<Category> getCategories();
 
-    Month[] getMonths();
+    List<Month> getMonths();
 
     List<Transaction> getTransactionsForMonth(String month);
+
+    Category getCategoryById(String categoryId);
+
+    Transaction geTransactionById(String transactionId);
 
     /**
      * This method returns all the transactions for the month along with the

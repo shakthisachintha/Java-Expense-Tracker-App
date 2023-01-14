@@ -34,7 +34,7 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     }
 
     public void addTransaction(Transaction transaction) {
-        // get month name 
+        // get month name
         String monthName = transaction.getDate().getMonthName().toLowerCase();
 
         // if month does not exist, add it
@@ -99,13 +99,13 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     public void newMonth(String month, double budget) {
         // month key
         String monthKey = month.toLowerCase();
-        
+
         // create new month object
         Month mon = new Month(month, budget);
-        
+
         // add the month to the main data structure
         addMonthToMainDataStructure(mon);
-        
+
         // add to the months map
         months.put(monthKey, mon);
     }
@@ -228,19 +228,18 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     }
 
     @Override
-    public Category[] getCategories() {
+    public List<Category> getCategories() {
         // get all the categories from the map
-        Category[] categoriesArray = new Category[categories.size()];
-        int i = 0;
+        List<Category> categoriesArray = new ArrayList<Category>();
+
         for (Category category : categories.values()) {
-            categoriesArray[i] = category;
-            i++;
+            categoriesArray.add(category);
         }
         return categoriesArray;
     }
 
     @Override
-    public Month[] getMonths() {
+    public List<Month> getMonths() {
         // get all the months from the map
         Month[] monthsArray = new Month[months.size()];
         int i = 0;
@@ -375,4 +374,17 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         return new ArrayList<Transaction>();
     }
 
+    @Override
+    public Category getCategoryById(String categoryId) {
+        if (categories.containsKey(categoryId))
+            return categories.get(categoryId);
+        return null;
+    }
+
+    @Override
+    public Transaction geTransactionById(String transactionId) {
+        if (transactions.containsKey(transactionId))
+            return transactions.get(transactionId);
+        return null;
+    }
 }
