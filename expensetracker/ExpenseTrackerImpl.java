@@ -241,13 +241,12 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     @Override
     public List<Month> getMonths() {
         // get all the months from the map
-        Month[] monthsArray = new Month[months.size()];
+        List<Month> monthsArray = new ArrayList<>();
         int i = 0;
         for (Month month : months.values()) {
-            monthsArray[i] = month;
-            i++;
+            monthsArray.add(month);
         }
-        return null;
+        return monthsArray;
     }
 
     @Override
