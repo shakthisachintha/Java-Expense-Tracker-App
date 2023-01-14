@@ -69,7 +69,7 @@ public class DisplayExpenseTracker {
     }
 
     public static void transactionMenuExecution() {
-        showTransactions();
+        displayTransactionListView();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Enter your choice: ");
@@ -77,23 +77,25 @@ public class DisplayExpenseTracker {
             clearConsole();
             switch (choice) {
                 case 1:
-                    createExpenseTransactionView();
+                    displayTransactionCreateView();
                     break;
                 case 2:
-                    showTransactions();
+                    displayTransactionListView();
                     break;
                 case 3:
+                    displayTransactionUpdateView();
                     break;
                 case 4:
-                    deleteTransaction();
+                    displayTransactionDeleteView();
                     break;
                 default:
+                    showMainView();
                     break;
             }
         }
     }
 
-    public static void createExpenseTransactionView() {
+    public static void displayTransactionCreateView() {
         viewHeader();
         Scanner scanner = new Scanner(System.in);
         List<Category> categoryList = new ArrayList<Category>();
@@ -136,26 +138,31 @@ public class DisplayExpenseTracker {
         Transaction transaction = new Transaction(trAmount, category, trNote, customeDate);
         tracker.addTransaction(transaction);
         System.out.println("\n\tTransaction Successfully Added !");
-        printNewLine();
-        printDottedLine();
-        printTransactionsViewMenu();
-        printDottedLine();
+        transactionMenuFooter();
     }
 
-    public static void createIncomeTransactionView() {
-        viewHeader();
-    }
-
-    public static void deleteTransaction() {
-        showTransactions();
+    public static void displayTransactionDeleteView() {
+        viewTransactionsListTable();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter Transaction ID : ");
+        System.out.print("\n\tEnter Transaction ID To Delete : ");
         String id = scanner.nextLine();
         tracker.deleteTransaction(id);
-        System.out.println("Transaction Successfully Deleted !");
-        // printDottedLine();
-        // printMenuOnlyWithDashBoard();
-        // printDottedLine();
+        System.out.println("\n\tTransaction Successfully Deleted !");
+        transactionMenuFooter();
+    }
+
+    public static void displayTransactionUpdateView() {
+        viewTransactionsListTable();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\n\tEnter Transaction ID To Update : ");
+        String id = scanner.nextLine();
+        System.out.print("\n\tEnter Transaction Note : ");
+        String note = scanner.nextLine();
+        System.out.print("\n\tEnter Transaction Amount : ");
+        double amount = scanner.nextDouble();
+        tracker.updateTransaction(id, note, amount);
+        System.out.println("\n\tTransaction Successfully Updated !");
+        transactionMenuFooter();
     }
 
     public static void categoryMenuExecution() {
@@ -181,10 +188,9 @@ public class DisplayExpenseTracker {
 
     public static void showCategoriesView() {
         viewHeader();
-        System.out.println("\tCategories :");
-        printNewLine();
+        System.out.println("\tCategory List :");
         for (Category categories : tracker.getCategories()) {
-            System.out.println("\t\t" + categories.getName());
+            System.out.println("\n\t   " + categories.getName());
         }
         printNewLine();
         printDottedLine();
@@ -230,7 +236,12 @@ public class DisplayExpenseTracker {
         }
     }
 
-    public static void showTransactions() {
+    public static void displayTransactionListView() {
+        viewTransactionsListTable();
+        transactionMenuFooter();
+    }
+
+    public static void viewTransactionsListTable() {
         String monthName = LocalDate.now().getMonth().name();
         List<Transaction> tList = tracker.getTransactionsForMonth(monthName);
         tList.sort((a, b) -> a.getType().compareTo(b.getType()));
@@ -262,10 +273,6 @@ public class DisplayExpenseTracker {
                                         + "mRs. " + transaction.getAmount() + "\033[0m"));
             }
         });
-        printNewLine();
-        printDottedLine();
-        printTransactionsViewMenu();
-        printDottedLine();
     }
 
     public static void viewHeader() {
@@ -282,20 +289,27 @@ public class DisplayExpenseTracker {
         printDottedLine();
     }
 
+    public static void transactionMenuFooter() {
+        printNewLine();
+        printDottedLine();
+        printTransactionsViewMenu();
+        printDottedLine();
+    }
+
     public static void printDottedLine() {
         System.out.println(
                 "\033[" + outlineColor
-                        + "m-----------------------------------------------------------------------------\033[0m");
+                        + "m---------------------------------------------------------------------------------\033[0m");
     }
 
     public static void printDoubleLine() {
         System.out.println(
                 "\033[" + outlineColor
-                        + "m=============================================================================\033[0m");
+                        + "m=================================================================================\033[0m");
     }
 
     public static void printExpenseTrackerTitle() {
-        System.out.println("                             Expense Tracker                            ");
+        System.out.println("                               Expense Tracker                            ");
     }
 
     public static void printMainMenu() {
