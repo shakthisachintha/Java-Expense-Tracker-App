@@ -1,5 +1,7 @@
 package expensetracker;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -7,6 +9,7 @@ import java.util.Scanner;
 import category.Category;
 import category.CategoryFactory;
 import constants.Constants;
+import date.Date;
 import transaction.Transaction;
 import types.TransactionType;
 
@@ -21,7 +24,7 @@ public class DisplayExpenseTracker {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             int choice = scanner.nextInt();
-            scanner.nextLine();
+
             // this will clear the previously displayed console data
             clearConsole();
 
@@ -47,7 +50,7 @@ public class DisplayExpenseTracker {
     public static void viewMainMenuOnUserInput() {
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
-        scanner.nextLine();
+
         clearConsole();
         switch (choice) {
             case 1:
@@ -67,29 +70,68 @@ public class DisplayExpenseTracker {
         showTransactions();
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
-        scanner.nextLine();
+
         clearConsole();
         switch (choice) {
             case 1:
-                createCategoryView(false);
+                createExpenseTransactionView();
                 viewMainMenuOnUserInput();
                 break;
             case 2:
-                createCategoryView(true);
+                createIncomeTransactionView();
                 viewMainMenuOnUserInput();
                 break;
             case 3:
+                deleteTransaction();
+                break;
             default:
                 showMainView();
                 break;
         }
     }
 
+    public static void createExpenseTransactionView() {
+        viewHeader();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter Transaction Note: ");
+        String trNote = scanner.nextLine();
+        System.out.println("Enter Transaction Amount: ");
+        double trAmount = scanner.nextDouble();
+        System.out.println("Enter Transaction Category From Below List: ");
+        for (Category categories : tracker.getCategories()) {
+            System.out.println("\t\t" + categories.getId() + categories.getName());
+        }
+        int trCategoryId = scanner.nextInt();
+        Category category =  tracker.getCategoryById(trCategoryId);
+        System.out.println("Enter Transaction Date: (yyyy-MM-dd)");
+        String trDate = scanner.nextLine();
+        LocalDate date = LocalDate.parse(trDate);
+        Date customeDate = new Date(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+        Transaction transaction = new Transaction(trAmount, category, trNote, customeDate);
+        tracker.addTransaction(transaction);
+        System.out.println("Transaction Successfully Added !");
+    }
+
+    public static void createIncomeTransactionView() {
+        viewHeader();
+    }
+
+    public static void deleteTransaction() {
+        showTransactions();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter Transaction ID : ");
+        String id = scanner.nextLine();
+        tracker.deleteTransaction(id);
+        System.out.println("Transaction Successfully Deleted !");
+        // printDottedLine();
+        // printMenuOnlyWithDashBoard();
+        // printDottedLine();
+    }
+
     public static void categoryMenuExecution() {
         showCategoriesView();
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
-        scanner.nextLine();
         clearConsole();
         switch (choice) {
             case 1:
