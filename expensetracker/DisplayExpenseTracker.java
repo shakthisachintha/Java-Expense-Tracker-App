@@ -10,8 +10,7 @@ public class DisplayExpenseTracker {
 
     // create a new ExpenseTracker object
     static ExpenseTracker tracker = ExpenseTrackerFactory.getExpenseTrackerWithDefaultData();
-
-    static String outlineColor = Constants.COLOR_WHITE;
+    static String outlineColor = Constants.COLOR_YELLOW;
 
     public static void viewTracker() {
         showMainView();
@@ -20,10 +19,11 @@ public class DisplayExpenseTracker {
             int choice = scanner.nextInt();
             scanner.nextLine();
             // this will clear the previously displayed console data
-            System.out.print("\033c");
+            clearConsole();
 
             switch (choice) {
                 case 1:
+                    showSpendings();
                     break;
                 case 2:
                     showTransactions();
@@ -44,7 +44,7 @@ public class DisplayExpenseTracker {
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
         scanner.nextLine();
-        System.out.print("\033c");
+        clearConsole();
         switch (choice) {
             case 1:
             default:
@@ -63,7 +63,7 @@ public class DisplayExpenseTracker {
         Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
         scanner.nextLine();
-        System.out.print("\033c");
+        clearConsole();
         switch (choice) {
             case 1:
                 createCategoryView(false);
@@ -82,11 +82,14 @@ public class DisplayExpenseTracker {
 
     public static void showCategoriesView() {
         viewHeader();
+        System.out.println("\tCategories :");
+        printNewLine();
         for (Category categories : tracker.getCategories()) {
-            System.out.println("    " + categories.getName());
+            System.out.println("\t\t" + categories.getName());
         }
+        printNewLine();
         printDottedLine();
-        showCategoriesViewMenu();
+        printCategoriesViewMenu();
         printDottedLine();
     }
 
@@ -103,17 +106,25 @@ public class DisplayExpenseTracker {
         // TODO: view return value from createcategory method
         System.out.println("Category Successfully Created !");
         printDottedLine();
-        createCategoryViewMenu();
+        printMenuOnlyWithDashBoard();
         printDottedLine();
     }
 
+    public static void showSpendings() {
+        System.out.println("count " + tracker.getSummaryForMonth("december").size());
+        viewHeader();
+        for (DtoMonthlySummaryData data : tracker.getSummaryForMonth("december")) {
+            System.out.println(data.category.getName() + "        " + data.totalAmount);
+        }
+        viewMainMenuOnUserInput();
+    }
+
     public static void showTransactions() {
-        // for (Transaction transactionsForMonth :
-        // tracker.getTransactionsForMonth("december")) {
-        // System.out.println(
-        // transactionsForMonth.getCategory().getName() + " " +
-        // transactionsForMonth.getAmount());
-        // }
+        viewHeader();
+        tracker.getTransactionsForMonth("december").forEach(transaction -> {
+            System.out.println(transaction.getNote()+"       "+transaction.getAmount());
+        }); 
+        viewFooter();
     }
 
     public static void viewHeader() {
@@ -150,15 +161,23 @@ public class DisplayExpenseTracker {
         System.out.println("Menu    1. Spending   2. Transactions   3. Categories   4.Exit");
     }
 
-    public static void createCategoryViewMenu() {
+    public static void printMenuOnlyWithDashBoard() {
         System.out.println("Menu    1. Dashboard");
     }
 
-    public static void showCategoriesViewMenu() {
+    public static void printCategoriesViewMenu() {
         System.out.println("Menu    1. Create Expense Category  2. Create Income Category  3.Back");
+    }
+
+    public static void printTransactionsViewMenu() {
+        System.out.println("Menu    1. Create Expense Transaction  2. Create Income Transaction  3.Back");
     }
 
     public static void printNewLine() {
         System.out.println("\n");
+    }
+
+    public static void clearConsole() {
+        System.out.print("\033c");
     }
 }
