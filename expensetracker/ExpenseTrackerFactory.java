@@ -9,8 +9,6 @@ public class ExpenseTrackerFactory {
 
     static boolean hasAddedDefaultData = false;
 
-    public static ExpenseTracker getExpenseTrackerWithOutDefaultData() {
-
     public static ExpenseTracker getExpenseTrackerWithoutDefaultData() {
         return ExpenseTrackerImpl.getExpenseTracker();
     }
@@ -34,7 +32,7 @@ public class ExpenseTrackerFactory {
             Category sports = CategoryFactory.createExpenseCategory("Sports");
             Category travel = CategoryFactory.createExpenseCategory("Travel");
 
-            expenseTracker.newMonth("January", 35000);
+            expenseTracker.newMonth("December", 35000);
 
             // add default categories to the expense tracker
             expenseTracker.addCategory(salary);
