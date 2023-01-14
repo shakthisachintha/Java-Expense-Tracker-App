@@ -34,6 +34,15 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     }
 
     public void addTransaction(Transaction transaction) {
+        // get month name 
+        String monthName = transaction.getDate().getMonthName().toLowerCase();
+
+        // if month does not exist, add it
+        if (!months.containsKey(monthName)) {
+            // create new month object
+            newMonth(monthName);
+        }
+
         if (transaction.isRecurring()) {
             addRecurringTransaction(transaction);
         } else {
@@ -90,8 +99,14 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     public void newMonth(String month, double budget) {
         // month key
         String monthKey = month.toLowerCase();
+        
+        // create new month object
         Month mon = new Month(month, budget);
+        
+        // add the month to the main data structure
         addMonthToMainDataStructure(mon);
+        
+        // add to the months map
         months.put(monthKey, mon);
     }
 
@@ -134,12 +149,14 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             for (var recurringTransactionKey : recurringTransactionKeys) {
                 var transaction = recurringTransactions.get(recurringTransactionKey);
                 if (transaction.isActive()) {
-                    // put transaction in main data structure
-                    // addTransactionToMainDataStructure(transaction);
+                    // get category key
+                    var categoryKey = transaction.getCategory().getId();
+
+                    // add transaction to main data structure
+                    mainDataStructure.get(monthKey).get(categoryKey).add(transaction.getId());
                 }
             }
         }
-
     }
 
     @Override
