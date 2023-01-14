@@ -387,4 +387,16 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             return transactions.get(transactionId);
         return null;
     }
+
+    @Override
+    public List<Category> getCategories(TransactionType type) {
+        List<Category> categoriesArray = new ArrayList<Category>();
+
+        for (Category category : categories.values()) {
+            if (category.getType() == type)
+                categoriesArray.add(category);
+        }
+
+        return categoriesArray;
+    }
 }
