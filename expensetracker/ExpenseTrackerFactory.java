@@ -1,22 +1,18 @@
 package expensetracker;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import category.Category;
 import category.CategoryFactory;
+import date.Date;
 import transaction.Transaction;
 
 public class ExpenseTrackerFactory {
-    public static ExpenseTracker getExpenseTrackerWithDefaultData() {
+    public static ExpenseTracker getExpenseTrackerWithoutDefaultData() {
         return ExpenseTrackerImpl.getExpenseTracker();
     }
 
-    public static ExpenseTracker getExpenseTrackerWithoutDefaultData() {
+    public static ExpenseTracker getExpenseTrackerWithDefaultData() {
 
         ExpenseTracker expenseTracker = ExpenseTrackerImpl.getExpenseTracker();
-        
+
         // add default categories
         Category salary = CategoryFactory.createIncomeCategory("Salary");
         Category eatingOut = CategoryFactory.createExpenseCategory("Eating Out");
@@ -30,7 +26,7 @@ public class ExpenseTrackerFactory {
         Category sports = CategoryFactory.createExpenseCategory("Sports");
         Category travel = CategoryFactory.createExpenseCategory("Travel");
 
-        expenseTracker.newMonth("January", 35000);
+        expenseTracker.newMonth("December", 35000);
 
         // add default categories to the expense tracker
         expenseTracker.addCategory(salary);
@@ -46,20 +42,11 @@ public class ExpenseTrackerFactory {
         expenseTracker.addCategory(travel);
 
         // add sample dates
-        Date date1 = new Date();
-        Date date2 = new Date();
-        Date date3 = new Date();
-        Date date4 = new Date();
-        Date date5 = new Date();
-        try {
-            date1 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-05");
-            date2 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-07");
-            date3 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-12");
-            date4 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-18");
-            date5 = new SimpleDateFormat("yyyy-MM-dd").parse("2022-12-27");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date date1 = new Date(2022, 12, 05);
+        Date date2 = new Date(2022, 12, 07);
+        Date date3 = new Date(2022, 12, 12);
+        Date date4 = new Date(2022, 12, 18);
+        Date date5 = new Date(2022, 12, 27);
 
         // add default transactions
         Transaction t1 = new Transaction(1000, eatingOut, "My Birthday treat for family members", date1);
