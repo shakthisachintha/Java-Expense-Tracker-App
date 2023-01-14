@@ -67,14 +67,15 @@ public class ExpenseTrackerFactory {
             Transaction t3 = new Transaction(12400, entertainment, "Had party with friends", date3);
             Transaction t4 = new Transaction(23000, shopping, "Shopping with the family", date4);
             Transaction t5 = new Transaction(9500, travel, "Trip to yala with the friends", date5);
-            Transaction t6 = new Transaction(115000, salary, "December Salary received", date5);
+            Transaction t6 = new Transaction(115000, salary, "Salary received", date5);
+            t6.setRecurring(true);
 
             Transaction t7 = new Transaction(4800, eatingOut, "Dinner from PizzaHut", date6);
             Transaction t8 = new Transaction(10000, fuel, "Filled my car up with petrol", date7);
             Transaction t9 = new Transaction(3000, kids, "Bought Toys for kids", date8);
             Transaction t10 = new Transaction(1400, sports, "Badminton Practices", date9);
             Transaction t11 = new Transaction(2500, sports, "Swimming Practices", date10);
-            Transaction t12 = new Transaction(115000, salary, "January Salary received", date10);
+            Transaction t12 = new Transaction(8000, credit, "Paid credit to Nuwan", date10);
 
             // add all the default transactions to expense tracker transaction list
             expenseTracker.addTransaction(t1);
