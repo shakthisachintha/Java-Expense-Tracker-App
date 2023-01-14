@@ -190,8 +190,6 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             // delete the transaction
             this.transactions.remove(transactionKey);
         }
-
-        transactions.get(transactionId).setActive(false);
     }
 
     @Override
