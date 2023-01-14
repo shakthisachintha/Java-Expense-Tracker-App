@@ -21,18 +21,17 @@ public class DisplayExpenseTracker {
     static String outlineColor = Constants.COLOR_YELLOW;
 
     public static void viewTracker() {
-        showMainView();
+        displayMainView();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter your choice: ");
+            System.out.print("\nEnter your choice: ");
             int choice = scanner.nextInt();
-
             // this will clear the previously displayed console data
             clearConsole();
 
             switch (choice) {
                 case 1:
-                    showMainView();
+                    displayMainView();
                     break;
                 case 2:
                     transactionMenuExecution();
@@ -41,28 +40,14 @@ public class DisplayExpenseTracker {
                     categoryMenuExecution();
                     break;
                 case 4:
-                    return;
                 default:
-                    showMainView();
-                    break;
+                    displayMainView();
+                    return;
             }
         }
     }
 
-    public static void viewMainMenuOnUserInput() {
-        Scanner scanner = new Scanner(System.in);
-        int choice = scanner.nextInt();
-
-        clearConsole();
-        switch (choice) {
-            case 1:
-            default:
-                showMainView();
-                break;
-        }
-    }
-
-    public static void showMainView() {
+    public static void displayMainView() {
         viewHeader();
         showSpendings();
         viewFooter();
@@ -72,7 +57,7 @@ public class DisplayExpenseTracker {
         displayTransactionListView();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter your choice: ");
+            System.out.print("\nEnter your choice: ");
             int choice = scanner.nextInt();
             clearConsole();
             switch (choice) {
@@ -89,8 +74,8 @@ public class DisplayExpenseTracker {
                     displayTransactionDeleteView();
                     break;
                 default:
-                    showMainView();
-                    break;
+                    displayMainView();
+                    return;
             }
         }
     }
@@ -166,66 +151,78 @@ public class DisplayExpenseTracker {
     }
 
     public static void categoryMenuExecution() {
-        showCategoriesView();
+        displayCategoryListView();
         Scanner scanner = new Scanner(System.in);
-        int choice = scanner.nextInt();
-        clearConsole();
-        switch (choice) {
-            case 1:
-                createCategoryView(false);
-                viewMainMenuOnUserInput();
-                break;
-            case 2:
-                createCategoryView(true);
-                viewMainMenuOnUserInput();
-                break;
-            case 3:
-            default:
-                showMainView();
-                break;
+        while (true) {
+            System.out.print("\nEnter your choice: ");
+            int choice = scanner.nextInt();
+            clearConsole();
+            switch (choice) {
+                case 1:
+                    displayCategoryCreateView(false);
+                    break;
+                case 2:
+                    displayCategoryCreateView(true);
+                    break;
+                case 3:
+                    displayCategoryListView();
+                    break;
+                case 4:
+                default:
+                    displayMainView();
+                    return;
+            }
         }
     }
 
-    public static void showCategoriesView() {
+    public static void displayCategoryListView() {
         viewHeader();
-        System.out.println("\tCategory List :");
+        System.out.println("\t\033[" + Constants.COLOR_BLUE + "mCategory List :\n\033[0m");
         for (Category categories : tracker.getCategories()) {
-            System.out.println("\n\t   " + categories.getName());
+            System.out.println("\t   " + categories.getName());
         }
-        printNewLine();
-        printDottedLine();
-        printCategoriesViewMenu();
-        printDottedLine();
+        categoryMenuFooter();
     }
 
-    public static void createCategoryView(boolean isIncomeCategory) {
+    public static void displayCategoryCreateView(boolean isIncomeCategory) {
         viewHeader();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter Category Name : ");
+        System.out.print("\tEnter Category Name : ");
         String name = scanner.nextLine();
         if (isIncomeCategory) {
-            tracker.addCategory(CategoryFactory.createExpenseCategory(name));
+            tracker.addCategory(CategoryFactory.createIncomeCategory(name));
         } else {
             tracker.addCategory(CategoryFactory.createExpenseCategory(name));
         }
         // TODO: view return value from createcategory method
-        System.out.println("Category Successfully Created !");
-        printDottedLine();
-        printMenuOnlyWithDashBoard();
-        printDottedLine();
+        System.out.println("\n\tCategory Successfully Created !");
+        categoryMenuFooter();
     }
 
     public static void showSpendings() {
         String monthName = LocalDate.now().getMonth().name();
         var result = tracker.getSummaryForMonth(monthName);
         if (result.size() > 0) {
+            double totalIncomeAmount = 0;
+            for (DtoMonthlySummaryData value : result) {
+                if (value.category.getType() == TransactionType.INCOME)
+                    totalIncomeAmount += value.totalAmount;
+            }
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mIncome\033[0m",
+                    "\033[" + Constants.COLOR_GREEN + "m\t   Rs. " + totalIncomeAmount + "\033[0m"));
+            for (DtoMonthlySummaryData data : result) {
+                if (data.category.getType() == TransactionType.INCOME)
+                    System.out.println(
+                            String.format("%-35s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount));
+            }
+
             double totalExpenseAmount = 0;
             for (DtoMonthlySummaryData value : result) {
                 if (value.category.getType() == TransactionType.EXPENSE)
                     totalExpenseAmount += value.totalAmount;
             }
-            System.out.println(String.format("%-35s %s", "\tExpense",
-                    "\033[" + Constants.COLOR_RED + "mRs. " + totalExpenseAmount + "\033[0m"));
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mExpense\033[0m",
+                    "\033[" + Constants.COLOR_RED + "m\t   Rs. " + totalExpenseAmount + "\033[0m"));
             for (DtoMonthlySummaryData data : result) {
                 if (data.category.getType() == TransactionType.EXPENSE)
                     System.out.println(
@@ -246,7 +243,7 @@ public class DisplayExpenseTracker {
         List<Transaction> tList = tracker.getTransactionsForMonth(monthName);
         tList.sort((a, b) -> a.getType().compareTo(b.getType()));
         viewHeader();
-        System.out.println("\tTransaction List : \n");
+        System.out.println("\033[" + Constants.COLOR_BLUE + "m\tTransaction List : \033[0m\n");
         System.out.println(
                 String.format("%-60s %s", "\t   " + "ID   " + "\033[" + outlineColor + "m|\033[0m Note",
                         "\033[" + outlineColor + "m |\033[0m Amount"));
@@ -296,6 +293,13 @@ public class DisplayExpenseTracker {
         printDottedLine();
     }
 
+    public static void categoryMenuFooter() {
+        printNewLine();
+        printDottedLine();
+        printCategoriesViewMenu();
+        printDottedLine();
+    }
+
     public static void printDottedLine() {
         System.out.println(
                 "\033[" + outlineColor
@@ -321,11 +325,11 @@ public class DisplayExpenseTracker {
     }
 
     public static void printCategoriesViewMenu() {
-        System.out.println("Menu    1. Add Expense Category  2. Add Income Category  3. Back To Main Menu");
+        System.out.println("Menu    1. Add Expense Category  2. Add Income Category  3. View  4. Main Menu");
     }
 
     public static void printTransactionsViewMenu() {
-        System.out.println("Menu    1. Add Transaction  2. View  3. Update  4. Delete  5. Back To Main Menu");
+        System.out.println("Menu    1. Add Transaction  2. View  3. Update  4. Delete  5. Main Menu");
     }
 
     public static void printNewLine() {
