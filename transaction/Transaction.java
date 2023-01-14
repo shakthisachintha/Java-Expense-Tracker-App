@@ -1,7 +1,5 @@
 package transaction;
 
-import java.text.DateFormatSymbols;
-
 import java.util.UUID;
 
 import category.Category;

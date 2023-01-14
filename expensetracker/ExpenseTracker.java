@@ -5,6 +5,7 @@ import java.util.List;
 import category.Category;
 import month.Month;
 import transaction.Transaction;
+import types.TransactionType;
 
 class CategoryTransactions {
     public Category category;
@@ -38,11 +39,17 @@ public interface ExpenseTracker {
 
     void updateTransaction(String transactionId, String note, double amount);
 
-    Category[] getCategories();
+    List<Category> getCategories();
 
-    Month[] getMonths();
+    List<Category> getCategories(TransactionType type);
+
+    List<Month> getMonths();
 
     List<Transaction> getTransactionsForMonth(String month);
+
+    Category getCategoryById(String categoryId);
+
+    Transaction geTransactionById(String transactionId);
 
     /**
      * This method returns all the transactions for the month along with the
