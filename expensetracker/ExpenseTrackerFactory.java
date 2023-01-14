@@ -72,7 +72,7 @@ public class ExpenseTrackerFactory {
             Transaction t7 = new Transaction(4800, eatingOut, "Dinner from PizzaHut", date6);
             Transaction t8 = new Transaction(10000, fuel, "Filled my car up with petrol", date7);
             Transaction t9 = new Transaction(3000, kids, "Bought Toys for kids", date8);
-            Transaction t10 = new Transaction(28000, shopping, "Shopping with the family", date9);
+            Transaction t10 = new Transaction(1400, sports, "Badminton Practices", date9);
             Transaction t11 = new Transaction(2500, sports, "Swimming Practices", date10);
             Transaction t12 = new Transaction(115000, salary, "January Salary received", date10);
 

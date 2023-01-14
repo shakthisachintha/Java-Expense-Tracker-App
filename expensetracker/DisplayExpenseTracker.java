@@ -1,9 +1,8 @@
 package expensetracker;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,6 +10,7 @@ import category.Category;
 import category.CategoryFactory;
 import constants.Constants;
 import date.Date;
+import month.Month;
 import transaction.Transaction;
 import types.TransactionType;
 
@@ -19,27 +19,40 @@ public class DisplayExpenseTracker {
     // create a new ExpenseTracker object
     static ExpenseTracker tracker = ExpenseTrackerFactory.getExpenseTrackerWithDefaultData();
     static String outlineColor = Constants.COLOR_YELLOW;
+    static String currentMonthName = LocalDate.now().getMonth().name().toLowerCase();
 
     public static void viewTracker() {
         displayMainView();
+        currentMonthName = currentMonthName.substring(0, 1).toUpperCase() + currentMonthName.substring(1);
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("\nEnter your choice: ");
-            int choice = scanner.nextInt();
+            String choice = scanner.nextLine();
             // this will clear the previously displayed console data
             clearConsole();
 
             switch (choice) {
-                case 1:
+                case "1":
                     displayMainView();
                     break;
-                case 2:
+                case "2":
                     transactionMenuExecution();
                     break;
-                case 3:
+                case "3":
                     categoryMenuExecution();
                     break;
-                case 4:
+                case "4":
+                    budgetMenuExecution();
+                    break;
+                case "<":
+                    changeCurrentMonth(false);
+                    displayMainView();
+                    break;
+                case ">":
+                    changeCurrentMonth(true);
+                    displayMainView();
+                    break;
+                case "5":
                 default:
                     displayMainView();
                     return;
@@ -58,21 +71,30 @@ public class DisplayExpenseTracker {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("\nEnter your choice: ");
-            int choice = scanner.nextInt();
+            String choice = scanner.nextLine();
             clearConsole();
             switch (choice) {
-                case 1:
+                case "1":
                     displayTransactionCreateView();
                     break;
-                case 2:
+                case "2":
                     displayTransactionListView();
                     break;
-                case 3:
+                case "3":
                     displayTransactionUpdateView();
                     break;
-                case 4:
+                case "4":
                     displayTransactionDeleteView();
                     break;
+                case "<":
+                    changeCurrentMonth(false);
+                    displayTransactionListView();
+                    break;
+                case ">":
+                    changeCurrentMonth(true);
+                    displayTransactionListView();
+                    break;
+                case "5":
                 default:
                     displayMainView();
                     return;
@@ -155,19 +177,27 @@ public class DisplayExpenseTracker {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("\nEnter your choice: ");
-            int choice = scanner.nextInt();
+            String choice = scanner.nextLine();
             clearConsole();
             switch (choice) {
-                case 1:
+                case "1":
                     displayCategoryCreateView(false);
                     break;
-                case 2:
+                case "2":
                     displayCategoryCreateView(true);
                     break;
-                case 3:
+                case "3":
                     displayCategoryListView();
                     break;
-                case 4:
+                case "<":
+                    changeCurrentMonth(false);
+                    displayCategoryListView();
+                    break;
+                case ">":
+                    changeCurrentMonth(true);
+                    displayCategoryListView();
+                    break;
+                case "4":
                 default:
                     displayMainView();
                     return;
@@ -200,15 +230,15 @@ public class DisplayExpenseTracker {
     }
 
     public static void showSpendings() {
-        String monthName = LocalDate.now().getMonth().name();
-        var result = tracker.getSummaryForMonth(monthName);
+        var result = tracker.getSummaryForMonth(currentMonthName);
+        double totalIncomeAmount = 0;
+        double totalExpenseAmount = 0;
         if (result.size() > 0) {
-            double totalIncomeAmount = 0;
             for (DtoMonthlySummaryData value : result) {
                 if (value.category.getType() == TransactionType.INCOME)
                     totalIncomeAmount += value.totalAmount;
             }
-            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mIncome\033[0m",
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mIncome\033[0m",
                     "\033[" + Constants.COLOR_GREEN + "m\t   Rs. " + totalIncomeAmount + "\033[0m"));
             for (DtoMonthlySummaryData data : result) {
                 if (data.category.getType() == TransactionType.INCOME)
@@ -216,18 +246,22 @@ public class DisplayExpenseTracker {
                             String.format("%-35s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount));
             }
 
-            double totalExpenseAmount = 0;
             for (DtoMonthlySummaryData value : result) {
                 if (value.category.getType() == TransactionType.EXPENSE)
                     totalExpenseAmount += value.totalAmount;
             }
-            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mExpense\033[0m",
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mExpense\033[0m",
                     "\033[" + Constants.COLOR_RED + "m\t   Rs. " + totalExpenseAmount + "\033[0m"));
             for (DtoMonthlySummaryData data : result) {
                 if (data.category.getType() == TransactionType.EXPENSE)
                     System.out.println(
                             String.format("%-35s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount));
             }
+            System.out.println("\033[" + outlineColor + "m"
+                    + "\t----------------------------------------------------\033[0m");
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mRemaining\033[0m",
+                    "\033[" + Constants.COLOR_PURPLE + "m\t   Rs. " + (totalIncomeAmount - totalExpenseAmount)
+                            + "\033[0m"));
         } else {
             System.out.println("                       No Transactions to Display                            ");
         }
@@ -239,8 +273,7 @@ public class DisplayExpenseTracker {
     }
 
     public static void viewTransactionsListTable() {
-        String monthName = LocalDate.now().getMonth().name();
-        List<Transaction> tList = tracker.getTransactionsForMonth(monthName);
+        List<Transaction> tList = tracker.getTransactionsForMonth(currentMonthName);
         tList.sort((a, b) -> a.getType().compareTo(b.getType()));
         viewHeader();
         System.out.println("\033[" + Constants.COLOR_BLUE + "m\tTransaction List : \033[0m\n");
@@ -272,10 +305,16 @@ public class DisplayExpenseTracker {
         });
     }
 
+    public static void budgetMenuExecution() {
+        viewHeader();
+    }
+
     public static void viewHeader() {
         printDoubleLine();
         printExpenseTrackerTitle();
         printDottedLine();
+        printNewLine();
+        printCurrentMonthName();
         printNewLine();
     }
 
@@ -300,6 +339,37 @@ public class DisplayExpenseTracker {
         printDottedLine();
     }
 
+    public static void changeCurrentMonth(boolean isNext) {
+        if (tracker.getMonths().size() == 0) {
+            return;
+        }
+        tracker.getMonths().sort((a, b) -> {
+            String[] monthOrder = {
+                    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+                    "November", "December"
+            };
+            return Integer.compare(
+                    Arrays.asList(monthOrder).indexOf(a),
+                    Arrays.asList(monthOrder).indexOf(b));
+        });
+        Month month = tracker.getMonths().stream().filter(m -> m.getName().equals(currentMonthName)).findFirst().get();
+        if (!isNext) {
+            int index = tracker.getMonths().indexOf(month);
+            if (index == 0) {
+                currentMonthName = tracker.getMonths().get(tracker.getMonths().size() - 1).getName();
+            } else {
+                currentMonthName = tracker.getMonths().get(index - 1).getName();
+            }
+        } else {
+            int index = tracker.getMonths().indexOf(month);
+            if (index == tracker.getMonths().size() - 1) {
+                currentMonthName = tracker.getMonths().get(0).getName();
+            } else {
+                currentMonthName = tracker.getMonths().get(index + 1).getName();
+            }
+        }
+    }
+
     public static void printDottedLine() {
         System.out.println(
                 "\033[" + outlineColor
@@ -316,12 +386,14 @@ public class DisplayExpenseTracker {
         System.out.println("                               Expense Tracker                            ");
     }
 
-    public static void printMainMenu() {
-        System.out.println("Menu    1. Spending   2. Transactions   3. Categories   4.Exit");
+    public static void printCurrentMonthName() {
+        System.out.println("        < Prev                     \033[" + Constants.COLOR_PURPLE + "m"
+                + currentMonthName.substring(0, 1).toUpperCase() + currentMonthName.substring(1)
+                + "\033[0m                      Next >           ");
     }
 
-    public static void printMenuOnlyWithDashBoard() {
-        System.out.println("Menu    1. Dashboard");
+    public static void printMainMenu() {
+        System.out.println("Menu    1. Spending   2. Transactions   3. Categories   4. Budget   5. Exit");
     }
 
     public static void printCategoriesViewMenu() {
