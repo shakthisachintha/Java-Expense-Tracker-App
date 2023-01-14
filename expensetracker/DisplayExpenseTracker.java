@@ -111,9 +111,10 @@ public class DisplayExpenseTracker {
     }
 
     public static void showSpendings() {
-        System.out.println("count " + tracker.getSummaryForMonth("december").size());
+        var result = tracker.getSummaryForMonth("december");
+        System.out.println("count " + result.size());
         viewHeader();
-        for (DtoMonthlySummaryData data : tracker.getSummaryForMonth("december")) {
+        for (DtoMonthlySummaryData data : result) {
             System.out.println(data.category.getName() + "        " + data.totalAmount);
         }
         viewMainMenuOnUserInput();

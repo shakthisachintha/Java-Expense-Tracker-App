@@ -65,7 +65,7 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
 
         // get all month keys
         var monthKeys = months.keySet();
-        
+
         // for each month
         for (var monthKey : monthKeys) {
             // add the category to the main data structure
@@ -110,12 +110,36 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         months.put(monthKey, mon);
     }
 
-    private void addMonthToMainDataStructure (Month month) {
+    private void addMonthToMainDataStructure(Month month) {
         // month key
         String monthKey = month.getName().toLowerCase();
-        
+
         // add to main data structure
         mainDataStructure.put(monthKey, new HashMap<String, List<String>>());
+
+        if (!categories.isEmpty()) {
+            // get all category keys
+            var categoryKeys = categories.keySet();
+
+            // for each category
+            for (var categoryKey : categoryKeys) {
+                // add the category to the main data structure
+                mainDataStructure.get(monthKey).put(categoryKey, new ArrayList<>());
+            }
+
+            // get recurring transaction keys
+            var recurringTransactionKeys = recurringTransactions.keySet();
+
+            // add each recurring transaction to the main data structure
+            for (var recurringTransactionKey : recurringTransactionKeys) {
+                var transaction = recurringTransactions.get(recurringTransactionKey);
+                if (transaction.isActive()) {
+                    // put transaction in main data structure
+                    // addTransactionToMainDataStructure(transaction);
+                }
+            }
+        }
+
     }
 
     @Override
@@ -230,22 +254,25 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
                 // get the transactions for the category
                 var categoryTransactions = this.getMonthlyTransactionForCategory(monthKey, categoryKey);
 
-                // get the total amount spent in the category
-                double total = 0;
-                for (var transaction : categoryTransactions) {
-                    total += transaction.getAmount();
+                if (!categoryTransactions.isEmpty()) {
+                    // get the total amount spent in the category
+                    double total = 0;
+                    for (var transaction : categoryTransactions) {
+                        total += transaction.getAmount();
+                    }
+
+                    // get the category name and type
+                    var category = categories.get(categoryKey);
+
+                    // add the total amount to the summary
+                    var summaryRow = new DtoMonthlySummaryData();
+                    summaryRow.category = category;
+                    summaryRow.totalAmount = total;
+
+                    // add the summary row to the summary
+                    summary.add(summaryRow);
                 }
 
-                // get the category name and type
-                var category = categories.get(categoryKey);
-
-                // add the total amount to the summary
-                var summaryRow = new DtoMonthlySummaryData();
-                summaryRow.category = category;
-                summaryRow.totalAmount = total;
-
-                // add the summary row to the summary
-                summary.add(summaryRow);
             }
             // return the summary
             return summary;
@@ -318,8 +345,8 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         String monthKey = month.toLowerCase();
         String categoryKey = categoryId.toLowerCase();
 
-        if (mainDataStructure.containsKey(categoryKey) && mainDataStructure.get(categoryKey).containsKey(monthKey)) {
-            var transactionKeys = mainDataStructure.get(categoryKey).get(monthKey);
+        if (mainDataStructure.containsKey(monthKey) && mainDataStructure.get(monthKey).containsKey(categoryKey)) {
+            var transactionKeys = mainDataStructure.get(monthKey).get(categoryKey);
             var activeTransactions = new ArrayList<Transaction>();
 
             for (var transactionKey : transactionKeys) {
