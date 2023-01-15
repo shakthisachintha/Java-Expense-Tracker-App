@@ -407,4 +407,14 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             categories.get(categoryKey).setBudget(budget);
         }
     }
+
+    @Override
+    public Month getMonth(String month) {
+        // get the month key
+        String monthKey = month.toLowerCase();
+        if (months.containsKey(monthKey)) {
+            return months.get(monthKey);
+        }
+        return null;
+    }
 }
