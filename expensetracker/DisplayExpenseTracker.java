@@ -271,10 +271,10 @@ public class DisplayExpenseTracker {
             System.out.println("\033[" + outlineColor + "m"
                     + "\t------------------------------------------------------------------------------------\033[0m");
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mMonthly Budget\033[0m",
-                    "\033[" + Constants.COLOR_PURPLE + "m\t    \033[" + outlineColor + "m|\033[0m Rs. "
+                    "\033[" + Constants.COLOR_PURPLE + "m\t    \033[" + outlineColor + "m|\033[0m "+"\033[" + Constants.COLOR_PURPLE + "mRs. "
                             + currentMonthBudget + "\033[0m  "));
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mRemaining\033[0m",
-                    "\033[" + Constants.COLOR_PURPLE + "m\t    \033[" + outlineColor + "m|\033[0m Rs. "
+                    "\033[" + Constants.COLOR_PURPLE + "m\t    \033[" + outlineColor + "m|\033[0m "+"\033[" + Constants.COLOR_PURPLE + "mRs. "
                             + (currentMonthBudget - totalExpenseAmount)
                             + "\033[0m  "));
         } else {
