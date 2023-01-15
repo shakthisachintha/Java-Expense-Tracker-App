@@ -349,8 +349,8 @@ public class DisplayExpenseTracker {
                     "November", "December"
             };
             return Integer.compare(
-                    Arrays.asList(monthOrder).indexOf(a),
-                    Arrays.asList(monthOrder).indexOf(b));
+                    Arrays.asList(monthOrder).indexOf(a.getName()),
+                    Arrays.asList(monthOrder).indexOf(b.getName()));
         });
         Month month = tracker.getMonths().stream().filter(m -> m.getName().equals(currentMonthName)).findFirst().get();
         if (!isNext) {
