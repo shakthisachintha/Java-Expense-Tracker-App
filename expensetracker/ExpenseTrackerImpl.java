@@ -20,17 +20,7 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     private Map<String, Transaction> recurringTransactions = new HashMap<>();
     private Map<String, Category> categories = new HashMap<>();
 
-    // Singleton pattern
-    private static ExpenseTrackerImpl expenseTracker;
-
-    private ExpenseTrackerImpl() {
-    }
-
-    public static ExpenseTrackerImpl getExpenseTracker() {
-        if (expenseTracker == null) {
-            expenseTracker = new ExpenseTrackerImpl();
-        }
-        return expenseTracker;
+    public ExpenseTrackerImpl() {
     }
 
     public void addTransaction(Transaction transaction) {
@@ -80,7 +70,6 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             // add the category to the main data structure
             mainDataStructure.get(monthKey).put(categoryKey, new ArrayList<>());
         }
-
         // add the category to the categories map
         categories.put(category.getId(), category);
     }
@@ -242,7 +231,6 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     public List<Month> getMonths() {
         // get all the months from the map
         List<Month> monthsArray = new ArrayList<>();
-        int i = 0;
         for (Month month : months.values()) {
             monthsArray.add(month);
         }
@@ -395,7 +383,28 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             if (category.getType() == type)
                 categoriesArray.add(category);
         }
-
         return categoriesArray;
+    }
+
+    @Override
+    public void setMonthlyBudget(String month, double budget) {
+        // get the month key
+        String monthKey = month.toLowerCase();
+
+        // check if the month exists
+        if (months.containsKey(monthKey)) {
+            months.get(monthKey).setBudget(budget);
+        }
+    }
+
+    @Override
+    public void setCategoryBudget(String categoryId, double budget) {
+        // get the category key
+        String categoryKey = categoryId.toLowerCase();
+
+        // check if the category exists
+        if (categories.containsKey(categoryKey)) {
+            categories.get(categoryKey).setBudget(budget);
+        }
     }
 }

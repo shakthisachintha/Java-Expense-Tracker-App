@@ -39,6 +39,10 @@ public interface ExpenseTracker {
 
     void updateTransaction(String transactionId, String note, double amount);
 
+    void setMonthlyBudget(String month, double budget);
+
+    void setCategoryBudget(String categoryId, double budget);
+
     List<Category> getCategories();
 
     List<Category> getCategories(TransactionType type);

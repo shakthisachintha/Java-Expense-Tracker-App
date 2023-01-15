@@ -1,12 +1,5 @@
 package month;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import category.Category;
-import transaction.Transaction;
-
 public class Month {
     private String name;
     private double budget;  // 0 if no budget

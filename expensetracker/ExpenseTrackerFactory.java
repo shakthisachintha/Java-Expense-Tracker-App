@@ -10,12 +10,12 @@ public class ExpenseTrackerFactory {
     static boolean hasAddedDefaultData = false;
 
     public static ExpenseTracker getExpenseTrackerWithoutDefaultData() {
-        return ExpenseTrackerImpl.getExpenseTracker();
+        return new ExpenseTrackerImpl();
     }
 
     public static ExpenseTracker getExpenseTrackerWithDefaultData() {
 
-        ExpenseTracker expenseTracker = ExpenseTrackerImpl.getExpenseTracker();
+        ExpenseTracker expenseTracker = new ExpenseTrackerImpl();
         if (!hasAddedDefaultData) {
             hasAddedDefaultData = true;
 
@@ -32,8 +32,7 @@ public class ExpenseTrackerFactory {
             Category sports = CategoryFactory.createExpenseCategory("Sports");
             Category travel = CategoryFactory.createExpenseCategory("Travel");
 
-            expenseTracker.newMonth("December", 35000);
-            expenseTracker.newMonth("January", 55000);
+            // expenseTracker.newMonth("December", 35000);
 
             // add default categories to the expense tracker
             expenseTracker.addCategory(salary);
@@ -60,6 +59,7 @@ public class ExpenseTrackerFactory {
             Date date8 = new Date(2023, 01, 7);
             Date date9 = new Date(2023, 01, 10);
             Date date10 = new Date(2023, 01, 13);
+            Date date11 = new Date(2023, 02, 13);
 
             // add default transactions
             Transaction t1 = new Transaction(1000, entertainment, "My Birthday treat for family members", date1);
@@ -69,13 +69,15 @@ public class ExpenseTrackerFactory {
             Transaction t5 = new Transaction(9500, travel, "Trip to yala with the friends", date5);
             Transaction t6 = new Transaction(115000, salary, "Salary received", date5);
             t6.setRecurring(true);
+            t5.setRecurring(true);
 
             Transaction t7 = new Transaction(4800, eatingOut, "Dinner from PizzaHut", date6);
             Transaction t8 = new Transaction(10000, fuel, "Filled my car up with petrol", date7);
             Transaction t9 = new Transaction(3000, kids, "Bought Toys for kids", date8);
             Transaction t10 = new Transaction(1400, sports, "Badminton Practices", date9);
             Transaction t11 = new Transaction(2500, sports, "Swimming Practices", date10);
-            Transaction t12 = new Transaction(8000, credit, "Paid credit to Nuwan", date10);
+
+            Transaction t12 = new Transaction(8000, credit, "Paid credit to Nuwan", date11);
 
             // add all the default transactions to expense tracker transaction list
             expenseTracker.addTransaction(t1);
@@ -90,7 +92,10 @@ public class ExpenseTrackerFactory {
             expenseTracker.addTransaction(t9);
             expenseTracker.addTransaction(t10);
             expenseTracker.addTransaction(t11);
+
             expenseTracker.addTransaction(t12);
+
+            // expenseTracker.newMonth("January", 55000);
         }
         return expenseTracker;
     }
