@@ -233,43 +233,43 @@ public class DisplayExpenseTracker {
         var result = tracker.getSummaryForMonth(currentMonthName);
         double totalIncomeAmount = 0;
         double totalExpenseAmount = 0;
-        double currentMonthBudget = 0;
+        double currentMonthBudget = tracker.getMonth(currentMonthName).getBudget();
         if (result.size() > 0) {
             for (DtoMonthlySummaryData value : result) {
                 if (value.category.getType() == TransactionType.INCOME)
                     totalIncomeAmount += value.totalAmount;
             }
-            System.out.println(String.format("%-35s %-15s %s", "\t   Category",
-                    "\tAmount","\tBudget"));
+            System.out.println(String.format("%-35s %-25s %-16s %-16s", "\t   Category",
+                    " \033[" + outlineColor + "m|\033[0m Amount", "  Budget", "  Remaining"));
             System.out.println("\033[" + outlineColor + "m"
-                    + "\t-------------------------------------------------------------\033[0m");
-            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mIncome\033[0m",
-                    "\033[" + Constants.COLOR_GREEN + "m\t     Rs. " + totalIncomeAmount + "\033[0m"));
-            for (DtoMonthlySummaryData data : result) {
-                if (data.category.getType() == TransactionType.INCOME)
-                    System.out.println(
-                            String.format("%-35s %-15s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount,"  Rs. " + data.category.getBudget()));
-            }
-
+                    + "\t------------------------------------------------------------------------------------\033[0m");
             for (DtoMonthlySummaryData value : result) {
                 if (value.category.getType() == TransactionType.EXPENSE)
                     totalExpenseAmount += value.totalAmount;
             }
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mExpense\033[0m",
-                    "\033[" + Constants.COLOR_RED + "m\t     Rs. " + totalExpenseAmount + "\033[0m"));
+                   "\t    \033[" + outlineColor + "m|\033[0m "+ "\033[" + Constants.COLOR_RED + "mRs. " + totalExpenseAmount + "\033[0m   "));
             for (DtoMonthlySummaryData data : result) {
                 if (data.category.getType() == TransactionType.EXPENSE)
+                    System.out.println(String.format("%-35s %-25s %-16s %-16s", "\t   " + data.category.getName(),
+                            " \033[" + outlineColor + "m|\033[0m Rs. " + data.totalAmount, "  Rs. " + data.category.getBudget(),
+                            (data.category.getBudget() > 0 ? 
+                            ("  Rs. " + (data.category.getBudget() - data.totalAmount)):("  Rs. 0.0"))));
+            }
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mIncome\033[0m",
+                    "\t    \033[" + outlineColor + "m|\033[0m "+"\033[" + Constants.COLOR_GREEN + "mRs. " + totalIncomeAmount + "\033[0m  "));
+            for (DtoMonthlySummaryData data : result) {
+                if (data.category.getType() == TransactionType.INCOME)
                     System.out.println(
-                            String.format("%-35s %-15s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount,"  Rs. " + data.category.getBudget()));
+                            String.format("%-35s %s", "\t   " + data.category.getName(), " \033[" + outlineColor + "m|\033[0m Rs. " + data.totalAmount));
             }
             System.out.println("\033[" + outlineColor + "m"
-                    + "\t-------------------------------------------------------------\033[0m");
+                    + "\t------------------------------------------------------------------------------------\033[0m");
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mMonthly Budget\033[0m",
-                    "\033[" + Constants.COLOR_PURPLE + "m\t     Rs. " + (currentMonthBudget)
-                            + "\033[0m"));
+                    "\033[" + Constants.COLOR_PURPLE + "m\t    \033[" + outlineColor + "m|\033[0m Rs. " + currentMonthBudget + "\033[0m  "));
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mRemaining\033[0m",
-                    "\033[" + Constants.COLOR_PURPLE + "m\t     Rs. " + (currentMonthBudget - totalExpenseAmount)
-                            + "\033[0m"));
+                    "\033[" + Constants.COLOR_PURPLE + "m\t    \033[" + outlineColor + "m|\033[0m Rs. " + (currentMonthBudget - totalExpenseAmount)
+                            + "\033[0m  "));
         } else {
             System.out.println("                       No Transactions to Display                            ");
         }
@@ -478,21 +478,21 @@ public class DisplayExpenseTracker {
     public static void printDottedLine() {
         System.out.println(
                 "\033[" + outlineColor
-                        + "m---------------------------------------------------------------------------------\033[0m");
+                        + "m--------------------------------------------------------------------------------------------------\033[0m");
     }
 
     public static void printDoubleLine() {
         System.out.println(
                 "\033[" + outlineColor
-                        + "m=================================================================================\033[0m");
+                        + "m==================================================================================================\033[0m");
     }
 
     public static void printExpenseTrackerTitle() {
-        System.out.println("                               Expense Tracker                            ");
+        System.out.println("\t\t\t\t\t  Expense Tracker");
     }
 
     public static void printCurrentMonthName() {
-        System.out.println("        < Prev                     \033[" + Constants.COLOR_PURPLE + "m"
+        System.out.println("\t         < Prev                     \033[" + Constants.COLOR_PURPLE + "m"
                 + currentMonthName.substring(0, 1).toUpperCase() + currentMonthName.substring(1)
                 + "\033[0m                      Next >           ");
     }
