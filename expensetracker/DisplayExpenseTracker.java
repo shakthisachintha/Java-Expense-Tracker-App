@@ -233,17 +233,22 @@ public class DisplayExpenseTracker {
         var result = tracker.getSummaryForMonth(currentMonthName);
         double totalIncomeAmount = 0;
         double totalExpenseAmount = 0;
+        double currentMonthBudget = 0;
         if (result.size() > 0) {
             for (DtoMonthlySummaryData value : result) {
                 if (value.category.getType() == TransactionType.INCOME)
                     totalIncomeAmount += value.totalAmount;
             }
+            System.out.println(String.format("%-35s %-15s %s", "\t   Category",
+                    "\tAmount","\tBudget"));
+            System.out.println("\033[" + outlineColor + "m"
+                    + "\t-------------------------------------------------------------\033[0m");
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mIncome\033[0m",
-                    "\033[" + Constants.COLOR_GREEN + "m\t   Rs. " + totalIncomeAmount + "\033[0m"));
+                    "\033[" + Constants.COLOR_GREEN + "m\t     Rs. " + totalIncomeAmount + "\033[0m"));
             for (DtoMonthlySummaryData data : result) {
                 if (data.category.getType() == TransactionType.INCOME)
                     System.out.println(
-                            String.format("%-35s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount));
+                            String.format("%-35s %-15s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount,"  Rs. " + data.category.getBudget()));
             }
 
             for (DtoMonthlySummaryData value : result) {
@@ -251,16 +256,19 @@ public class DisplayExpenseTracker {
                     totalExpenseAmount += value.totalAmount;
             }
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_BLUE + "mExpense\033[0m",
-                    "\033[" + Constants.COLOR_RED + "m\t   Rs. " + totalExpenseAmount + "\033[0m"));
+                    "\033[" + Constants.COLOR_RED + "m\t     Rs. " + totalExpenseAmount + "\033[0m"));
             for (DtoMonthlySummaryData data : result) {
                 if (data.category.getType() == TransactionType.EXPENSE)
                     System.out.println(
-                            String.format("%-35s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount));
+                            String.format("%-35s %-15s %s", "\t   " + data.category.getName(), "  Rs. " + data.totalAmount,"  Rs. " + data.category.getBudget()));
             }
             System.out.println("\033[" + outlineColor + "m"
-                    + "\t----------------------------------------------------\033[0m");
+                    + "\t-------------------------------------------------------------\033[0m");
+            System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mMonthly Budget\033[0m",
+                    "\033[" + Constants.COLOR_PURPLE + "m\t     Rs. " + (currentMonthBudget)
+                            + "\033[0m"));
             System.out.println(String.format("%-35s %s", "\t\033[" + Constants.COLOR_PURPLE + "mRemaining\033[0m",
-                    "\033[" + Constants.COLOR_PURPLE + "m\t   Rs. " + (totalIncomeAmount - totalExpenseAmount)
+                    "\033[" + Constants.COLOR_PURPLE + "m\t     Rs. " + (currentMonthBudget - totalExpenseAmount)
                             + "\033[0m"));
         } else {
             System.out.println("                       No Transactions to Display                            ");
