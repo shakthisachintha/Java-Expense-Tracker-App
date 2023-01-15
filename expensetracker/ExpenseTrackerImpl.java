@@ -1,8 +1,13 @@
 package expensetracker;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import category.Category;
+import category.CategoryFactory;
+import date.Date;
 import month.Month;
 import transaction.Transaction;
 import types.TransactionType;
@@ -23,7 +28,15 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
     public ExpenseTrackerImpl() {
     }
 
-    public void addTransaction(Transaction transaction) {
+    @Override
+    public String addTransaction(double amount, String categoryId, String note, Date date, boolean isRecurring) {
+
+        // get the category
+        Category category = getCategoryById(categoryId);
+
+        // create a new transaction
+        Transaction transaction =  new Transaction(amount, category, note, date, isRecurring);
+
         // get month name
         String monthName = transaction.getDate().getMonthName().toLowerCase();
 
@@ -39,6 +52,9 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
             addNonRecurringTransaction(transaction);
         }
         addTransactionToMainDataStructure(transaction);
+
+        // return the transaction id
+        return transaction.getId();
     }
 
     private void addTransactionToMainDataStructure(Transaction transaction) {
@@ -58,7 +74,11 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         mainDataStructure.get(monthKey).put(categoryKey, transactions);
     }
 
-    public void addCategory(Category category) {
+    @Override
+    public String addCategory(String categoryName, double budget, TransactionType type) {
+        // create a new category
+        Category category = CategoryFactory.createCategory(categoryName, budget, type);
+
         // get the category key
         var categoryKey = category.getId().toLowerCase();
 
@@ -72,6 +92,9 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         }
         // add the category to the categories map
         categories.put(category.getId(), category);
+
+        // return the category id
+        return category.getId();
     }
 
     private void addRecurringTransaction(Transaction transaction) {
@@ -221,6 +244,7 @@ public class ExpenseTrackerImpl implements ExpenseTracker {
         // get all the categories from the map
         List<Category> categoriesArray = new ArrayList<Category>();
 
+        // loop through the categories
         for (Category category : categories.values()) {
             categoriesArray.add(category);
         }

@@ -3,6 +3,7 @@ package expensetracker;
 import java.util.List;
 
 import category.Category;
+import date.Date;
 import month.Month;
 import transaction.Transaction;
 import types.TransactionType;
@@ -27,9 +28,9 @@ class DtoFullDetailsForMonth {
 }
 
 public interface ExpenseTracker {
-    void addTransaction(Transaction transaction);
+    String addTransaction(double amount, String categoryId, String note, Date date, boolean isRecurring);
 
-    void addCategory(Category category);
+    String addCategory(String categoryName, double budget, TransactionType type);
 
     void newMonth(String month, double budget);
 

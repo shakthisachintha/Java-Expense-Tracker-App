@@ -3,7 +3,7 @@ package category;
 import types.TransactionType;
 
 public class ExpenseCategoryImpl extends Category {
-    public ExpenseCategoryImpl(String name) {
+    public ExpenseCategoryImpl(String name){
         super(name);
     }
 

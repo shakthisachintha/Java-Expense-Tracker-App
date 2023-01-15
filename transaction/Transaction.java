@@ -15,7 +15,7 @@ public class Transaction {
     private boolean isRecurring = false;
     private boolean isActive = true;
     
-    public Transaction(double amount, Category category, String note, Date date) {
+    public Transaction(double amount, Category category, String note, Date date, boolean isRecurring) {
         this.id = UUID.randomUUID().toString().substring(0, 4);
         this.amount = amount;
         this.category = category;

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import category.Category;
-import category.CategoryFactory;
 import constants.Constants;
 import date.Date;
 import month.Month;
@@ -132,7 +131,6 @@ public class DisplayExpenseTracker {
         scanner.nextLine();
         System.out.print("\t   ");
         String catId = scanner.nextLine();
-        Category category = tracker.getCategoryById(catId);
         System.out.print("\n\tEnter Transaction Note:  ");
         String trNote = scanner.nextLine();
         System.out.print("\n\tEnter Transaction Amount:  ");
@@ -142,10 +140,10 @@ public class DisplayExpenseTracker {
         String trDate = scanner.nextLine();
         LocalDate date = LocalDate.parse(trDate);
         Date customeDate = new Date(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-        Transaction transaction = new Transaction(trAmount, category, trNote, customeDate);
-        tracker.addTransaction(transaction);
+        tracker.addTransaction(trAmount, catId, trNote, customeDate, false);
         System.out.println("\n\tTransaction Successfully Added !");
         transactionMenuFooter();
+        scanner.close();
     }
 
     public static void displayTransactionDeleteView() {
@@ -156,6 +154,7 @@ public class DisplayExpenseTracker {
         tracker.deleteTransaction(id);
         System.out.println("\n\tTransaction Successfully Deleted !");
         transactionMenuFooter();
+        scanner.close();
     }
 
     public static void displayTransactionUpdateView() {
@@ -170,6 +169,7 @@ public class DisplayExpenseTracker {
         tracker.updateTransaction(id, note, amount);
         System.out.println("\n\tTransaction Successfully Updated !");
         transactionMenuFooter();
+        scanner.close();
     }
 
     public static void categoryMenuExecution() {
@@ -219,14 +219,10 @@ public class DisplayExpenseTracker {
         Scanner scanner = new Scanner(System.in);
         System.out.print("\tEnter Category Name : ");
         String name = scanner.nextLine();
-        if (isIncomeCategory) {
-            tracker.addCategory(CategoryFactory.createIncomeCategory(name));
-        } else {
-            tracker.addCategory(CategoryFactory.createExpenseCategory(name));
-        }
-        // TODO: view return value from createcategory method
+        tracker.addCategory(name, 0, isIncomeCategory ? TransactionType.INCOME : TransactionType.EXPENSE);
         System.out.println("\n\tCategory Successfully Created !");
         categoryMenuFooter();
+        scanner.close();
     }
 
     public static void showSpendings() {
@@ -412,6 +408,7 @@ public class DisplayExpenseTracker {
             }
         }
         budgetMenuFooter();
+        scanner.close();
     }
 
     public static void viewHeader() {

@@ -1,9 +1,7 @@
 package expensetracker;
 
-import category.Category;
-import category.CategoryFactory;
 import date.Date;
-import transaction.Transaction;
+import types.TransactionType;
 
 public class ExpenseTrackerFactory {
 
@@ -19,33 +17,20 @@ public class ExpenseTrackerFactory {
         if (!hasAddedDefaultData) {
             hasAddedDefaultData = true;
 
-            // add default categories
-            Category salary = CategoryFactory.createIncomeCategory("Salary");
-            Category eatingOut = CategoryFactory.createExpenseCategory("Eating Out");
-            Category credit = CategoryFactory.createExpenseCategory("Credit");
-            Category entertainment = CategoryFactory.createExpenseCategory("Entertainment");
-            Category fuel = CategoryFactory.createExpenseCategory("Fuel");
-            Category general = CategoryFactory.createExpenseCategory("General");
-            Category holidays = CategoryFactory.createExpenseCategory("Holidays");
-            Category kids = CategoryFactory.createExpenseCategory("Kids");
-            Category shopping = CategoryFactory.createExpenseCategory("Shopping");
-            Category sports = CategoryFactory.createExpenseCategory("Sports");
-            Category travel = CategoryFactory.createExpenseCategory("Travel");
-
             expenseTracker.newMonth("December", 35000);
 
             // add default categories to the expense tracker
-            expenseTracker.addCategory(salary);
-            expenseTracker.addCategory(eatingOut);
-            expenseTracker.addCategory(credit);
-            expenseTracker.addCategory(entertainment);
-            expenseTracker.addCategory(fuel);
-            expenseTracker.addCategory(general);
-            expenseTracker.addCategory(holidays);
-            expenseTracker.addCategory(kids);
-            expenseTracker.addCategory(shopping);
-            expenseTracker.addCategory(sports);
-            expenseTracker.addCategory(travel);
+            String catID1 = expenseTracker.addCategory("Salary", 0, TransactionType.INCOME);
+            String catID2 = expenseTracker.addCategory("Eating Out", 0, TransactionType.EXPENSE);
+            String catID3 = expenseTracker.addCategory("Credit", 0, TransactionType.EXPENSE);
+            String catID4 = expenseTracker.addCategory("Debit", 0, TransactionType.EXPENSE);
+            String catID5 = expenseTracker.addCategory("Fuel", 0, TransactionType.EXPENSE);
+            String catID6 = expenseTracker.addCategory("General", 0, TransactionType.EXPENSE);
+            String catID7 = expenseTracker.addCategory("Holidays", 0, TransactionType.EXPENSE);
+            String catID8 = expenseTracker.addCategory("Kids", 0, TransactionType.EXPENSE);
+            String catID9 = expenseTracker.addCategory("Shopping", 0, TransactionType.EXPENSE);
+            String catID10 = expenseTracker.addCategory("Sports", 0, TransactionType.EXPENSE);
+            String catID11 = expenseTracker.addCategory("Travel", 0, TransactionType.EXPENSE);
 
             // add sample dates
             Date date1 = new Date(2022, 12, 05);
@@ -59,43 +44,26 @@ public class ExpenseTrackerFactory {
             Date date8 = new Date(2023, 01, 7);
             Date date9 = new Date(2023, 01, 10);
             Date date10 = new Date(2023, 01, 13);
+
             Date date11 = new Date(2023, 02, 13);
 
-            // add default transactions
-            Transaction t1 = new Transaction(1000, entertainment, "My Birthday treat for family members", date1);
-            Transaction t2 = new Transaction(5000, fuel, "Filled my car up with petrol", date2);
-            Transaction t3 = new Transaction(12400, entertainment, "Had party with friends", date3);
-            Transaction t4 = new Transaction(23000, shopping, "Shopping with the family", date4);
-            Transaction t5 = new Transaction(9500, travel, "Trip to yala with the friends", date5);
-            Transaction t6 = new Transaction(115000, salary, "Salary received", date5);
-            t6.setRecurring(true);
-            t5.setRecurring(true);
-
-            Transaction t7 = new Transaction(4800, eatingOut, "Dinner from PizzaHut", date6);
-            Transaction t8 = new Transaction(10000, fuel, "Filled my car up with petrol", date7);
-            Transaction t9 = new Transaction(3000, kids, "Bought Toys for kids", date8);
-            Transaction t10 = new Transaction(1400, sports, "Badminton Practices", date9);
-            Transaction t11 = new Transaction(2500, sports, "Swimming Practices", date10);
-
-            Transaction t12 = new Transaction(8000, credit, "Paid credit to Nuwan", date11);
-
             // add all the default transactions to expense tracker transaction list
-            expenseTracker.addTransaction(t1);
-            expenseTracker.addTransaction(t2);
-            expenseTracker.addTransaction(t3);
-            expenseTracker.addTransaction(t4);
-            expenseTracker.addTransaction(t5);
-            expenseTracker.addTransaction(t6);
+            expenseTracker.addTransaction(1000, catID2, "My Birthday treat for family members", date1, false);
+            expenseTracker.addTransaction(5000, catID5, "Filled my car up with petrol", date2, false);
+            expenseTracker.addTransaction(12400, catID2, "Had party with friends", date3, false);
+            expenseTracker.addTransaction(23000, catID9, "Shopping with the family", date4, false);
+            expenseTracker.addTransaction(9500, catID11, "Trip to yala with the friends", date5, true);
+            expenseTracker.addTransaction(115000, catID1, "Salary received", date5, true);
 
             expenseTracker.newMonth("January", 55000);
             
-            expenseTracker.addTransaction(t7);
-            expenseTracker.addTransaction(t8);
-            expenseTracker.addTransaction(t9);
-            expenseTracker.addTransaction(t10);
-            expenseTracker.addTransaction(t11);
+            expenseTracker.addTransaction(4800, catID2, "Dinner from PizzaHut", date6, false);
+            expenseTracker.addTransaction(10000, catID5, "Filled my car up with petrol", date7, false);
+            expenseTracker.addTransaction(3000, catID8, "Bought Toys for kids", date8, false);
+            expenseTracker.addTransaction(1400, catID10, "Badminton Practices", date9, false);
+            expenseTracker.addTransaction(2500, catID10, "Swimming Practices", date10, false);
 
-            expenseTracker.addTransaction(t12);
+            expenseTracker.addTransaction(8000, catID3, "Paid credit to Nuwan", date11, false);
 
             
         }
