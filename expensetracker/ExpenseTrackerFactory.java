@@ -32,7 +32,7 @@ public class ExpenseTrackerFactory {
             Category sports = CategoryFactory.createExpenseCategory("Sports");
             Category travel = CategoryFactory.createExpenseCategory("Travel");
 
-            // expenseTracker.newMonth("December", 35000);
+            expenseTracker.newMonth("December", 35000);
 
             // add default categories to the expense tracker
             expenseTracker.addCategory(salary);
@@ -87,6 +87,8 @@ public class ExpenseTrackerFactory {
             expenseTracker.addTransaction(t5);
             expenseTracker.addTransaction(t6);
 
+            expenseTracker.newMonth("January", 55000);
+            
             expenseTracker.addTransaction(t7);
             expenseTracker.addTransaction(t8);
             expenseTracker.addTransaction(t9);
@@ -95,7 +97,7 @@ public class ExpenseTrackerFactory {
 
             expenseTracker.addTransaction(t12);
 
-            // expenseTracker.newMonth("January", 55000);
+            
         }
         return expenseTracker;
     }

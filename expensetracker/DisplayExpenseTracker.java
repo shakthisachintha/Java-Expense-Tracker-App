@@ -306,7 +306,97 @@ public class DisplayExpenseTracker {
     }
 
     public static void budgetMenuExecution() {
+        displayBudgetListView();
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print("\nEnter your choice: ");
+            String choice = scanner.nextLine();
+            clearConsole();
+            switch (choice) {
+                case "1":
+                    displayBudgetCreateView();
+                    break;
+                case "2":
+                    displayBudgetListView();
+                    break;
+                case "<":
+                    changeCurrentMonth(false);
+                    displayBudgetListView();
+                    break;
+                case ">":
+                    changeCurrentMonth(true);
+                    displayBudgetListView();
+                    break;
+                case "3":
+                default:
+                    displayMainView();
+                    return;
+            }
+        }
+    }
+
+    public static void displayBudgetListView() {
         viewHeader();
+        System.out.println("\t\033[" + Constants.COLOR_BLUE + "mMonthly Budget List :\n\033[0m");
+        for (Month month : tracker.getMonths()) {
+            System.out.println(String.format("%-35s %s", "\t   " + month.getName(), month.getBudget()));
+        }
+
+        System.out.println("\n\t\033[" + Constants.COLOR_BLUE + "mCategory Budget List :\n\033[0m");
+        for (Category categories : tracker.getCategories()) {
+            System.out.println(String.format("%-35s %s", "\t   " + categories.getName(), categories.getBudget()));
+        }
+        budgetMenuFooter();
+    }
+
+    public static void displayBudgetCreateView() {
+        viewHeader();
+        Scanner scanner = new Scanner(System.in);
+        List<Category> categoryList = new ArrayList<Category>();
+        List<Month> monthList = new ArrayList<Month>();
+        System.out.print("\tEnter Budget Type: ");
+        System.out.println("\t   1. " + "Monthly" + "   2. " + "Category");
+        System.out.print("\t");
+        int trType = scanner.nextInt();
+        while (true) {
+            if (trType == 1) {
+                monthList = tracker.getMonths();
+                System.out.println("\n\tEnter Month From Below List: \n");
+                for (Month month : monthList) {
+                    System.out.println("\t   " + month.getName());
+                }
+                scanner.nextLine();
+                System.out.print("\t   ");
+                String monthName = scanner.nextLine();
+                System.out.print("\n\tEnter Budget Amount: ");
+                double budget = scanner.nextDouble();
+                tracker.setMonthlyBudget(monthName, budget);
+                System.out.println("\n\tBudget Successfully Added !");
+                break;
+            } else if (trType == 2) {
+                categoryList = tracker.getCategories();
+                System.out.println("\n\tEnter Category ID From Below List: \n");
+                System.out.println("\t   ID\t\033[" + outlineColor + "m|\033[0m Name");
+                System.out.println("\033[" + outlineColor + "m\t   ---------------------\033[0m");
+                for (Category categories : categoryList) {
+                    System.out.println(
+                            "\t   " + categories.getId() + "\t\033[" + outlineColor + "m|\033[0m "
+                                    + categories.getName());
+                }
+                scanner.nextLine();
+                System.out.print("\t   ");
+                String catId = scanner.nextLine();
+                System.out.print("\n\tEnter Budget Amount: ");
+                double budget = scanner.nextDouble();
+                tracker.setCategoryBudget(catId, budget);
+                System.out.println("\n\tBudget Successfully Added !");
+                break;
+            } else {
+                System.out.println("\tInvalid Budget Type ! Enter Again .");
+                trType = scanner.nextInt();
+            }
+        }
+        budgetMenuFooter();
     }
 
     public static void viewHeader() {
@@ -336,6 +426,13 @@ public class DisplayExpenseTracker {
         printNewLine();
         printDottedLine();
         printCategoriesViewMenu();
+        printDottedLine();
+    }
+
+    public static void budgetMenuFooter() {
+        printNewLine();
+        printDottedLine();
+        printBudgetViewMenu();
         printDottedLine();
     }
 
@@ -402,6 +499,10 @@ public class DisplayExpenseTracker {
 
     public static void printTransactionsViewMenu() {
         System.out.println("Menu    1. Add Transaction  2. View  3. Update  4. Delete  5. Main Menu");
+    }
+
+    public static void printBudgetViewMenu() {
+        System.out.println("Menu    1. Add Budget  2. View   3. Main Menu");
     }
 
     public static void printNewLine() {
